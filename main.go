@@ -1,14 +1,14 @@
 package main
 
 import (
-        "fmt"
 	"bufio"
 	"flag"
+	"fmt"
+	"github.com/prometheus/client_golang/prometheus"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 const namespace = "stockprice_exporter"
@@ -29,11 +29,11 @@ var (
 		"0",
 		"An identification code used to identify a publicly traded corporation on a particular stock market.",
 	)
-        stockExchangeCode = flag.String(
-                "stock-exchange-code",
-                "TYO",
-                "https://www.google.com/intl/en/googlefinance/disclaimer/?ei=QpGRWejgDNOG0ATRtIiQCA",
-        )
+	stockExchangeCode = flag.String(
+		"stock-exchange-code",
+		"TYO",
+		"https://www.google.com/intl/en/googlefinance/disclaimer/?ei=QpGRWejgDNOG0ATRtIiQCA",
+	)
 )
 
 type Exporter struct {
@@ -92,10 +92,10 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 }
 
 func (e *Exporter) StockPrice(ch chan<- prometheus.Metric) {
-        api_url := "https://www.google.com/finance/getprices?q=%s&x=%s&i=300&p=1m&f=d,c,v,o,h,l&df=cpct&auto=1&ei=4rrIWJHoIYya0QS1i4IQ"
+	api_url := "https://www.google.com/finance/getprices?q=%s&x=%s&i=300&p=1m&f=d,c,v,o,h,l&df=cpct&auto=1&ei=4rrIWJHoIYya0QS1i4IQ"
 	res, err := http.Get(fmt.Sprintf(api_url,
-                        *tickerSymbol,
-                        *stockExchangeCode,))
+		*tickerSymbol,
+		*stockExchangeCode))
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -109,12 +109,12 @@ func (e *Exporter) StockPrice(ch chan<- prometheus.Metric) {
 			break
 		}
 
-                if i < 8 {
-                    continue
-                }
+		if i < 8 {
+			continue
+		}
 
-		if strings.HasPrefix(sc.Text(), "TIMEZONE_OFFSET")  {
-                    continue
+		if strings.HasPrefix(sc.Text(), "TIMEZONE_OFFSET") {
+			continue
 		}
 
 		csv_record, err := parseCsv(sc.Text())
